@@ -362,6 +362,9 @@ assert_addons_enabled() {
 
 refresh_helm_dependencies() {
     echo "refresh_helm_dependencies"
+    for file in $(find . -type f); do
+        echo "Found file: $file"
+    done
     # This needs to be run after any dependency template change before "helm <template | install>"
     helm dependencies update ./HyperPodHelmChartForRIG
 }
