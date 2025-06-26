@@ -363,7 +363,7 @@ assert_addons_enabled() {
 refresh_helm_dependencies() {
     echo "refresh_helm_dependencies"
     # This needs to be run after any dependency template change before "helm <template | install>"
-    helm dependencies update ./tmp/resilience/sagemaker-hyperpod-cli-rig-dev/helm_chart/HyperPodHelmChartForRIG
+    helm dependencies update ./HyperPodHelmChartForRIG
 }
 
 render_rig_helm_chart() {
