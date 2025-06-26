@@ -306,12 +306,13 @@ fetch_yaml_and_enable_overrides() {
         #####################################################
         # Clean and (Re)Create Helm chart directories
         #####################################################
+  echo "Clean and (Re)Create Helm chart directories"
 	if ! in_skiplist "$name" "${PATCH_ONLY[@]}" ; then
             rm -rf $OUTPUT_DIR/charts/$name/templates
             rm -f $OUTPUT_DIR/charts/$name/*.tgz
             mkdir -p $OUTPUT_DIR/charts/$name/templates
 	fi
-
+  echo "Enable Overrides in Helm Charts/YAML"
         #####################################################
         # Enable Overrides in Helm Charts/YAML
         #####################################################
@@ -331,16 +332,16 @@ fetch_yaml_and_enable_overrides() {
 		get_helm_chart_from_eks $kind $name $namespace | \
 		    enable_nodeselectors_and_tolerations_overrides $outpath
             fi
-	else
-	    if in_skiplist "$name" "${PATCH_ONLY[@]}"; then
-		continue
-            else
-                cp -r $SRC_DIR/charts/$name/. $OUTPUT_DIR/charts/$name
-                rm -rf $OUTPUT_DIR/charts/$name/templates/*
+	# else
+	#     if in_skiplist "$name" "${PATCH_ONLY[@]}"; then
+	# 	continue
+  #           else
+  #               cp -r $SRC_DIR/charts/$name/. $OUTPUT_DIR/charts/$name
+  #               rm -rf $OUTPUT_DIR/charts/$name/templates/*
 
-                get_helm_chart_from_local $SRC_DIR $name $kind | \
-                   enable_nodeselectors_and_tolerations_overrides $outpath
-	    fi
+  #               get_helm_chart_from_local $SRC_DIR $name $kind | \
+  #                  enable_nodeselectors_and_tolerations_overrides $outpath
+	#     fi
 	fi
     done
 }
