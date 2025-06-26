@@ -19,8 +19,8 @@ add_ons=(
     "eks,kube-system,coredns,deployment"
     #"hp,kube-system,mpi-operator,deployment"
     #"hp,kube-system,neuron-device-plugin,daemonset"
-    "hp,kubeflow,$TRAINING_OPERATORS,deployment"
-    "hp,kube-system,$EFA,daemonset"
+    # "hp,kubeflow,$TRAINING_OPERATORS,deployment"
+    # "hp,kube-system,$EFA,daemonset"
 )
 
 generate_helm_chart_root() {
