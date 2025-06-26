@@ -1,0 +1,9 @@
+dependencies:
+- name: nvidia-device-plugin
+  repository: https://nvidia.github.io/k8s-device-plugin
+  version: 0.16.1
+- name: coredns
+  repository: file://charts/coredns
+  version: 0.1.0
+digest: sha256:46c874b7dbcb493a32cc7eda03afe2b9dfba511ccd0e8b5ffb41e2c253a60f7b
+generated: "2025-06-26T11:18:37.432078589Z"
