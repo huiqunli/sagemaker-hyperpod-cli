@@ -306,13 +306,11 @@ fetch_yaml_and_enable_overrides() {
         #####################################################
         # Clean and (Re)Create Helm chart directories
         #####################################################
-  echo "Clean and (Re)Create Helm chart directories"
 	if ! in_skiplist "$name" "${PATCH_ONLY[@]}" ; then
             rm -rf $OUTPUT_DIR/charts/$name/templates
             rm -f $OUTPUT_DIR/charts/$name/*.tgz
             mkdir -p $OUTPUT_DIR/charts/$name/templates
 	fi
-  echo "Enable Overrides in Helm Charts/YAML"
         #####################################################
         # Enable Overrides in Helm Charts/YAML
         #####################################################
@@ -361,10 +359,6 @@ assert_addons_enabled() {
 }
 
 refresh_helm_dependencies() {
-    echo "refresh_helm_dependencies"
-    for file in $(find . -type f); do
-        echo "Found file: $file"
-    done
     # This needs to be run after any dependency template change before "helm <template | install>"
     helm dependencies update ./HyperPodHelmChartForRIG
 }
@@ -382,50 +376,44 @@ render_rig_helm_chart() {
 
 confirm_installation_with_user() {
     local outpath=$1
-    read -p "🚀 Do you want to install this Helm chart ($outpath) ? [y/N]: " confirm
-
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-      echo "🔧 Installing Helm chart..."
-      helm upgrade --install rig-dependencies ./HyperPodHelmChartForRIG --namespace kube-system -f ./HyperPodHelmChartForRIG/values.yaml
-      if [ $? -ne 0 ]; then
-        echo "RIG Helm Installation Failed. Exiting (0/4 steps completed)..."
-        return 1
-      fi
-  
-      # aws-node needs specific instllation for *.nonrig.yaml
-      kubectl apply -f HyperPodHelmChartForRIG/charts/aws-node/templates/daemonset.nonrig.yaml -n kube-system
-      if [ $? -ne 0 ]; then
-        echo "RIG Helm Installation Failed (aws-node). Exiting (only 1/4 steps completed)..."
-        return 1
-      fi
-
-      # training-operator needs specific patch
-      override_training_operators
-      if [ $? -ne 0 ]; then
-        echo "RIG Helm Installation Failed (training-operator). Exiting (only 2/4 steps completed)..."
-        return 1
-      fi
-
-      # efa needs specific patch
-      override_efa
-      if [ $? -ne 0 ]; then
-        echo "RIG Helm Installation Failed (aws-efa-k8s-device-plugin). Exiting (only 3/4 steps completed)..."
-        return 1
-      fi
-
-      echo ""
-      echo "RIG Helm Installation Succeeded (4/4 steps completed)."
-      echo ""
-
-      # Warn user about CNI start up
-      echo ""
-      echo "⚠️ Note: aws-node (AWS VPC CNI) is a critical add-on for general pod use."
-      echo "Other pods that depend on aws-node (e.g. CoreDNS, HyperPod HealthMonitoringAgent,...) may experience 'FailedCreatePodSandBox' if the aws-node pods are not available before start up."
-      echo "Therefore, please allow additional time for K8s to recreate the pods and/or manually recreate the pods (or let K8s recreate after cleaning up) before full cluster use."
-      echo ""
-    else
-      echo "❌ Installation cancelled."
+    echo "🔧 Installing Helm chart..."
+    helm upgrade --install rig-dependencies ./HyperPodHelmChartForRIG --namespace kube-system -f ./HyperPodHelmChartForRIG/values.yaml
+    if [ $? -ne 0 ]; then
+      echo "RIG Helm Installation Failed. Exiting (0/4 steps completed)..."
+      return 1
     fi
+
+    # aws-node needs specific instllation for *.nonrig.yaml
+    kubectl apply -f HyperPodHelmChartForRIG/charts/aws-node/templates/daemonset.nonrig.yaml -n kube-system
+    if [ $? -ne 0 ]; then
+      echo "RIG Helm Installation Failed (aws-node). Exiting (only 1/4 steps completed)..."
+      return 1
+    fi
+
+    # training-operator needs specific patch
+    override_training_operators
+    if [ $? -ne 0 ]; then
+      echo "RIG Helm Installation Failed (training-operator). Exiting (only 2/4 steps completed)..."
+      return 1
+    fi
+
+    # efa needs specific patch
+    override_efa
+    if [ $? -ne 0 ]; then
+      echo "RIG Helm Installation Failed (aws-efa-k8s-device-plugin). Exiting (only 3/4 steps completed)..."
+      return 1
+    fi
+
+    echo ""
+    echo "RIG Helm Installation Succeeded (4/4 steps completed)."
+    echo ""
+
+    # Warn user about CNI start up
+    echo ""
+    echo "⚠️ Note: aws-node (AWS VPC CNI) is a critical add-on for general pod use."
+    echo "Other pods that depend on aws-node (e.g. CoreDNS, HyperPod HealthMonitoringAgent,...) may experience 'FailedCreatePodSandBox' if the aws-node pods are not available before start up."
+    echo "Therefore, please allow additional time for K8s to recreate the pods and/or manually recreate the pods (or let K8s recreate after cleaning up) before full cluster use."
+    echo ""
 }
 
 ensure_yq_installed(){
@@ -444,8 +432,8 @@ ensure_yq_installed(){
 }
 
 main() {
-    cd ./tmp/resilience/sagemaker-hyperpod-cli-rig-dev/helm_chart || {
-      echo "Directory not found: ./tmp/resilience/sagemaker-hyperpod-cli-rig-dev/helm_chart"
+    cd ./tmp/rig/sagemaker-hyperpod-cli-rig-dev/helm_chart || {
+      echo "Directory not found: ./tmp/rig/sagemaker-hyperpod-cli-rig-dev/helm_chart"
       exit 1
     }
     echo "Now in $(pwd)"
