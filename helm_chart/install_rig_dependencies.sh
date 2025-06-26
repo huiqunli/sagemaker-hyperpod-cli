@@ -444,6 +444,12 @@ ensure_yq_installed(){
 }
 
 main() {
+    cd ./tmp/resilience/sagemaker-hyperpod-cli-rig-dev/helm_chart || {
+      echo "Directory not found: ./tmp/resilience/sagemaker-hyperpod-cli-rig-dev/helm_chart"
+      exit 1
+    }
+    echo "Now in $(pwd)"
+
     ensure_yq_installed
 
     assert_addons_enabled add_ons[@]
