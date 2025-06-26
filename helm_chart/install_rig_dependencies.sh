@@ -449,7 +449,7 @@ main() {
     fetch_yaml_and_enable_overrides add_ons[@]
 
     local outpath="./rig-dependencies.yaml"
-    refresh_helm_dependencies
+    # refresh_helm_dependencies
     render_rig_helm_chart $outpath
     confirm_installation_with_user $outpath
 }
