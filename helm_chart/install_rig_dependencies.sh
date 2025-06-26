@@ -19,8 +19,8 @@ add_ons=(
     "eks,kube-system,coredns,deployment"
     #"hp,kube-system,mpi-operator,deployment"
     #"hp,kube-system,neuron-device-plugin,daemonset"
-    # "hp,kubeflow,$TRAINING_OPERATORS,deployment"
-    # "hp,kube-system,$EFA,daemonset"
+    "hp,kubeflow,$TRAINING_OPERATORS,deployment"
+    "hp,kube-system,$EFA,daemonset"
 )
 
 generate_helm_chart_root() {
@@ -332,16 +332,16 @@ fetch_yaml_and_enable_overrides() {
 		get_helm_chart_from_eks $kind $name $namespace | \
 		    enable_nodeselectors_and_tolerations_overrides $outpath
             fi
-	# else
-	#     if in_skiplist "$name" "${PATCH_ONLY[@]}"; then
-	# 	continue
-  #           else
-  #               cp -r $SRC_DIR/charts/$name/. $OUTPUT_DIR/charts/$name
-  #               rm -rf $OUTPUT_DIR/charts/$name/templates/*
+	else
+	    if in_skiplist "$name" "${PATCH_ONLY[@]}"; then
+		continue
+            else
+                cp -r $SRC_DIR/charts/$name/. $OUTPUT_DIR/charts/$name
+                rm -rf $OUTPUT_DIR/charts/$name/templates/*
 
-  #               get_helm_chart_from_local $SRC_DIR $name $kind | \
-  #                  enable_nodeselectors_and_tolerations_overrides $outpath
-	#     fi
+                get_helm_chart_from_local $SRC_DIR $name $kind | \
+                   enable_nodeselectors_and_tolerations_overrides $outpath
+	    fi
 	fi
     done
 }
@@ -361,11 +361,13 @@ assert_addons_enabled() {
 }
 
 refresh_helm_dependencies() {
+    echo "refresh_helm_dependencies"
     # This needs to be run after any dependency template change before "helm <template | install>"
     helm dependencies update ./HyperPodHelmChartForRIG
 }
 
 render_rig_helm_chart() {
+    echo "render_rig_helm_chart"
     local outpath=$1
     helm template rig-dependencies ./HyperPodHelmChartForRIG --namespace kube-system -f ./HyperPodHelmChartForRIG/values.yaml > $outpath
     echo ""
